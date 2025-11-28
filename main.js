@@ -40,20 +40,20 @@ const initAudio = async () => {
   sharawadji.masterGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 10);
 };
 
-let SPEECH_PLAYBACK_RATE = 0.8;
+let speechPlaybackRate = 0.8;
 
 const loadFromSpeechServer = async (text) => {
   const response = await fetch('http://localhost:3000/speech', { method: 'post', body: text });
   const buffer = await audioContext.decodeAudioData(await response.arrayBuffer());
   const source = new AudioBufferSourceNode(audioContext, { buffer });
-  source.playbackRate.value = SPEECH_PLAYBACK_RATE;
+  source.playbackRate.value = speechPlaybackRate;
   source.connect(audioContext.destination);
   source.start();
 
   return source;
 };
 
-document.body.addEventListener('click', initAudio, { once: true });
+document.body.addEventListener('keypress', initAudio, { once: true });
 
 requestAnimationFrame(move);
 
@@ -99,11 +99,16 @@ startAnimating();
 const commandInput = document.getElementById('command');
 
 const execute = (text) => {
+  speechPlaybackRate = Math.random() + 0.5;
   loadFromSpeechServer(text);
 
   const command = text.trim().toLowerCase().replace(/[^a-z]/g, '');
   switch (command) {
+    case 'further':
     case 'go':
+    case 'keepgoing':
+    case 'keepwalking':
+    case 'walk':
       const links = panorama.getLinks();
       if (links.length === 0) return;
 
