@@ -1,0 +1,83 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: black;
+  color: white;
+  font-family: monospace;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes command-blend {
+  0% { mix-blend-mode: hard-light; }
+  40% { mix-blend-mode: screen; }
+  43% { mix-blend-mode: hard-light; }
+  50% { mix-blend-mode: difference; }
+  52% { mix-blend-mode: hard-light; }
+  77% { mix-blend-mode: overlay; }
+  79% { mix-blend-mode: hard-light; }
+}
+
+#command {
+  --length: 6;
+  --rows: round(up, calc(var(--length) / 5));
+
+  animation: command-blend 5s infinite alternate step-end both;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  line-height: 1;
+  text-shadow: -0.025em 0.025em red, -0.05em 0.05em purple;
+  background: none;
+  border: none;
+  appearance: none;
+  font: inherit;
+  font-size: calc(100vh / var(--rows));
+  color: inherit;
+  text-transform: uppercase;
+  text-align: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  mix-blend-mode: hard-light;
+}
+
+#command:focus {
+  outline: none;
+}
+
+#pano {
+  height: 100vh;
+  z-index: -1;
+}
+
+#shader {
+  animation: fade-in 5s alternate both infinite;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  mix-blend-mode: luminosity;
+  opacity: 0.5;
+}
+
+#command::selection {
+  background-color: transparent;
+  text-decoration: line-through #0008 wavy;
+}
