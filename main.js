@@ -11,9 +11,11 @@ setOptions({ key: env.GOOGLE_MAPS_API_KEY });
 
 const { StreetViewPanorama } = await importLibrary('streetView');
 
+let sharawadji = null;
 const panorama = new StreetViewPanorama(document.getElementById('pano'), { position: { lat: 41.380319074503305, lng: 2.1771172573345092 }});
 
 const ROTATE_SPEED = 0.05;
+const COMMANDER_URL = 'http://localhost:5000';
 
 const move = () => {
   requestAnimationFrame(move);
@@ -27,7 +29,7 @@ audioContext.suspend();
 window.ac = audioContext;
 
 const initAudio = async () => {
-  const sharawadji = new Sharawadji([], panorama, audioContext);
+  sharawadji = new Sharawadji([], panorama, audioContext);
 
   const position = panorama.getPosition();
   const sounds = await getSurroundingSounds({ lat: position.lat(), lng: position.lng() });
@@ -98,17 +100,20 @@ startAnimating();
 
 const commandInput = document.getElementById('command');
 
-const execute = (text) => {
+const translateCommand = async (text) => {
+  const url = new URL(COMMANDER_URL);
+  url.searchParams.set('query', text);
+  const response = await fetch(url);
+  return response.text();
+}
+
+const execute = async (text) => {
   speechPlaybackRate = Math.random() + 0.5;
   loadFromSpeechServer(text);
 
-  const command = text.trim().toLowerCase().replace(/[^a-z]/g, '');
+  const command = await translateCommand(text);
   switch (command) {
-    case 'further':
-    case 'go':
-    case 'keepgoing':
-    case 'keepwalking':
-    case 'walk':
+    case 'GO':
       const links = panorama.getLinks();
       if (links.length === 0) return;
 
@@ -121,6 +126,15 @@ const execute = (text) => {
       console.info('[command]', 'go', link);
       panorama.setPano(link.pano);
       panorama.setPov({ pitch: panorama.getPov().pitch, heading: link.heading });
+      break;
+    case 'QUIET':
+      sharawadji?.masterGain.gain.setValueAtTime(1, audioContext.currentTime);
+      sharawadji?.masterGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 5);
+      break;
+    case 'LOUD':
+      sharawadji?.masterGain.gain.setValueAtTime(0, audioContext.currentTime);
+      sharawadji?.masterGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 5);
+      break;
     default:
       return;
   }

@@ -1,0 +1,20 @@
+[project]
+name = "commander"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "jakubfiala",email = "j4kub.fiala@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "sentence-transformers (>=5.1.2,<6.0.0)",
+    "flask (>=3.1.2,<4.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "commander", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
