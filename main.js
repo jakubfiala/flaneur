@@ -154,6 +154,8 @@ const execute = async (text) => {
   }
 };
 
+const commandHistory = [];
+
 commandInput.addEventListener('input', (event) => {
   commandInput.style.setProperty('--length', commandInput.value.length);
 })
@@ -163,6 +165,8 @@ commandInput.addEventListener('keydown', (event) => {
     event.preventDefault();
     const selection = document.getSelection().toString();
     if (selection === "") return;
+
+    commandHistory.push(commandInput.value);
 
     if (event.shiftKey) {
       loadFromSpeechServer(selection);
@@ -178,5 +182,7 @@ commandInput.addEventListener('keydown', (event) => {
     animation.addEventListener('finish', () => {
       commandInput.value = commandInput.value.replace(selection, "");
     }, { once: true });
+  } else if (event.key === 'ArrowUp') {
+    commandInput.value = commandHistory.at(-1) ?? '';
   }
 })
