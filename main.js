@@ -40,7 +40,6 @@ const initAudio = async () => {
   await audioContext.resume();
 
   sharawadji.masterGain.gain.setValueAtTime(0, audioContext.currentTime);
-  sharawadji.masterGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 10);
 };
 
 let speechPlaybackRate = 0.8;
@@ -109,17 +108,17 @@ const translateCommand = async (text) => {
 }
 
 const parseCommandText = (text) => {
-  const matches = text.match(/^(.*){(.*)}$/i);
+  const matches = text.match(/^(.*){([0-9]):(.*)}$/i);
   if (!matches) {
-    return { command: text, args: null };
+    return { command: text, track: null, args: null };
   }
 
-  const [m, command, args] = matches;
-  return { command, args };
+  const [m, command, track, args] = matches;
+  return { command, track, args };
 }
 
 const execute = async (text) => {
-  const { command, args } = parseCommandText(text);
+  const { command, track, args } = parseCommandText(text);
 
   speechPlaybackRate = Math.random() + 0.5;
   loadFromSpeechServer(command);
@@ -150,8 +149,8 @@ const execute = async (text) => {
       sharawadji?.masterGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 5);
       break;
     case 'PLAY':
-      if (!args) break;
-      play(args);
+      if (Number.isNaN(track) || !args) break;
+      play(track, args);
       break;
     default:
       return;
@@ -159,7 +158,7 @@ const execute = async (text) => {
 };
 
 commandInput.addEventListener('input', (event) => {
-  commandInput.rows = commandInput.value.split('\n').length;
+  commandInput.style.setProperty('--length', commandInput.value.length);
 })
 
 commandInput.addEventListener('keydown', (event) => {

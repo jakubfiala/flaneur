@@ -40,7 +40,6 @@ body {
 
 #command {
   --length: 6;
-  --rows: round(up, calc(var(--length) / 5));
 
   animation: command-blend 5s infinite alternate step-end both;
   width: 100vw;
@@ -51,7 +50,7 @@ body {
   border: none;
   appearance: none;
   font: inherit;
-  font-size: 30vh;
+  font-size: clamp(5rem, calc(100vw / var(--length) * 1.5), 100vh);
   color: inherit;
   text-align: center;
   position: fixed;
@@ -86,4 +85,18 @@ body {
 #command::selection {
   background-color: transparent;
   text-decoration: line-through #0008 wavy;
+}
+
+#strudel-code {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  font-size: 5rem;
+  width: max-content;
+  opacity: 1;
+  mix-blend-mode: exclusion;
+  color: red;
+  text-shadow: 3px 3px blue;
+  opacity: 0.8;
 }
