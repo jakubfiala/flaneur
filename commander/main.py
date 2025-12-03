@@ -9,8 +9,11 @@ headers = {
     "Cache-Control": "max-age=3600",
 }
 
+print("Starting command server")
+
 @app.route("/")
 def main():
+    print("Received command")
     query = request.args.get("query", None)
     if query is None:
         return "No query provided", 400

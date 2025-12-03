@@ -12,8 +12,8 @@ def get_command(query):
     query_embedding: Tensor = embedder.encode_query(query, convert_to_tensor=True)
     [[result]] = util.semantic_search(query_embedding, corpus_embeddings, top_k=1)
     corpus_id = result.get("corpus_id")
-
-    if corpus_id is None or corpus_id not in corpus:
+    print(corpus_id)
+    if corpus_id is None:
         return None
 
     print(f"Returning '{corpus[corpus_id]}'")

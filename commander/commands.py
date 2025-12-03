@@ -3,4 +3,5 @@ corpus = [
     ("TRIP", "Psychedelic trip, funky colors, hallucinations"),
     ("QUIET", "Silence, hush, keep quiet, turn off the music"),
     ("LOUD", "Turn the sound up, make it louder"),
+    ("PLAY", "play, perform, make music, play the beats"),
 ]

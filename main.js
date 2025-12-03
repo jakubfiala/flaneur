@@ -6,6 +6,7 @@ import { choose, clamp } from './vercajch.js';
 import { getSurroundingSounds } from './freesound.js';
 import Sharawadji from './sharawadji/index.js';
 import env from "./env.js";
+import { play } from "./strudel.js";
 
 setOptions({ key: env.GOOGLE_MAPS_API_KEY });
 
@@ -91,7 +92,7 @@ const animate = (time) => {
   }
 
   requestAnimationFrame(animate);
-  draw(time, renderedMouse.x, renderedMouse.y, canvas.width, canvas.height, false);
+  // draw(time, renderedMouse.x, renderedMouse.y, canvas.width, canvas.height, false);
 };
 
 export const startAnimating = () => requestAnimationFrame(animate);
@@ -107,12 +108,25 @@ const translateCommand = async (text) => {
   return response.text();
 }
 
-const execute = async (text) => {
-  speechPlaybackRate = Math.random() + 0.5;
-  loadFromSpeechServer(text);
+const parseCommandText = (text) => {
+  const matches = text.match(/^(.*){(.*)}$/i);
+  if (!matches) {
+    return { command: text, args: null };
+  }
 
-  const command = await translateCommand(text);
-  switch (command) {
+  const [m, command, args] = matches;
+  return { command, args };
+}
+
+const execute = async (text) => {
+  const { command, args } = parseCommandText(text);
+
+  speechPlaybackRate = Math.random() + 0.5;
+  loadFromSpeechServer(command);
+
+  const translated = await translateCommand(command);
+
+  switch (translated) {
     case 'GO':
       const links = panorama.getLinks();
       if (links.length === 0) return;
@@ -135,13 +149,17 @@ const execute = async (text) => {
       sharawadji?.masterGain.gain.setValueAtTime(0, audioContext.currentTime);
       sharawadji?.masterGain.gain.linearRampToValueAtTime(1, audioContext.currentTime + 5);
       break;
+    case 'PLAY':
+      if (!args) break;
+      play(args);
+      break;
     default:
       return;
   }
 };
 
 commandInput.addEventListener('input', (event) => {
-  commandInput.style.setProperty('--length', clamp(commandInput.value.length, 0, 100));
+  commandInput.rows = commandInput.value.split('\n').length;
 })
 
 commandInput.addEventListener('keydown', (event) => {

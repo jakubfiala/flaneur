@@ -1,4 +1,5 @@
 vars
 speech
+node_modules
 
 __pycache__
