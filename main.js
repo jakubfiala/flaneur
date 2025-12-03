@@ -42,13 +42,11 @@ const initAudio = async () => {
   sharawadji.masterGain.gain.setValueAtTime(0, audioContext.currentTime);
 };
 
-let speechPlaybackRate = 0.8;
-
 const loadFromSpeechServer = async (text) => {
   const response = await fetch('http://localhost:3000/speech', { method: 'post', body: text });
   const buffer = await audioContext.decodeAudioData(await response.arrayBuffer());
   const source = new AudioBufferSourceNode(audioContext, { buffer });
-  source.playbackRate.value = speechPlaybackRate;
+  source.playbackRate.value = Math.random() + 0.5;
   source.connect(audioContext.destination);
   source.start();
 
@@ -120,7 +118,6 @@ const parseCommandText = (text) => {
 const execute = async (text) => {
   const { command, track, args } = parseCommandText(text);
 
-  speechPlaybackRate = Math.random() + 0.5;
   loadFromSpeechServer(command);
 
   const translated = await translateCommand(command);
@@ -164,6 +161,22 @@ commandInput.addEventListener('input', (event) => {
 commandInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     event.preventDefault();
-    execute(document.getSelection().toString());
+    const selection = document.getSelection().toString();
+    if (selection === "") return;
+
+    if (event.shiftKey) {
+      loadFromSpeechServer(selection);
+    } else {
+      execute(selection);
+    }
+
+    const animation = commandInput.animate([
+      { transform: "scale(1)", opacity: 1 },
+      { transform: "scale(7)", opacity: 0.25 },
+    ], { duration: 300 });
+
+    animation.addEventListener('finish', () => {
+      commandInput.value = commandInput.value.replace(selection, "");
+    }, { once: true });
   }
 })
